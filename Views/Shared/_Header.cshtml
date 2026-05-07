@@ -1,0 +1,130 @@
+@using eqcportal.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext Db
+
+@{
+    var title = ViewData["Title"]?.ToString() ?? "Bảng điều khiển";
+    var breadcrumb = ViewData["Breadcrumb"]?.ToString() ?? "EQC Portal";
+    var recentCutoff = DateTime.Now.AddDays(-7);
+
+    var pendingLeaveQuery = Db.LeaveRequests
+        .Include(l => l.Employee)
+        .Where(l => l.Status == "Pending" || l.Status == "Chờ duyệt");
+
+    var recentReviewQuery = Db.PerformanceReviews
+        .Include(r => r.Employee)
+        .Where(r => r.CreatedAt >= recentCutoff);
+
+    var pendingLeaveCount = await pendingLeaveQuery.CountAsync();
+    var recentReviewCount = await recentReviewQuery.CountAsync();
+
+    var pendingLeaves = await pendingLeaveQuery
+        .OrderByDescending(l => l.CreatedAt)
+        .Take(4)
+        .ToListAsync();
+
+    var recentReviews = await recentReviewQuery
+        .OrderByDescending(r => r.CreatedAt)
+        .Take(3)
+        .ToListAsync();
+
+    var notificationCount = pendingLeaveCount + recentReviewCount;
+
+    string TimeAgo(DateTime dateTime)
+    {
+        var elapsed = DateTime.Now - dateTime;
+        if (elapsed.TotalMinutes < 1) return "vừa xong";
+        if (elapsed.TotalHours < 1) return $"{Math.Max(1, (int)elapsed.TotalMinutes)} phút trước";
+        if (elapsed.TotalDays < 1) return $"{Math.Max(1, (int)elapsed.TotalHours)} giờ trước";
+        return $"{Math.Max(1, (int)elapsed.TotalDays)} ngày trước";
+    }
+}
+
+<header class="app-header">
+    <div class="d-flex align-items-center gap-3 min-w-0">
+        <button id="sidebarToggle" class="icon-btn d-md-none" type="button" aria-label="Mở điều hướng" aria-controls="appSidebar" aria-expanded="false">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
+        <div class="min-w-0">
+            <h1 class="header-title text-truncate">@title</h1>
+            <div class="header-breadcrumb text-truncate">@breadcrumb</div>
+        </div>
+    </div>
+
+    <div class="header-actions">
+        <div class="dropdown">
+            <button class="btn btn-outline-primary quick-actions-trigger" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-bolt me-1" aria-hidden="true"></i>
+                <span>Thao tác nhanh</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end quick-action-menu">
+                @await Html.PartialAsync("_QuickActions")
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Thông báo">
+                <i class="fa-regular fa-bell" aria-hidden="true"></i>
+                @if (notificationCount > 0)
+                {
+                    <span class="notification-count">@notificationCount</span>
+                }
+            </button>
+            <div class="dropdown-menu dropdown-menu-end notification-menu">
+                <div class="notification-header">
+                    <strong>Thông báo</strong>
+                    <a class="small" asp-controller="LeaveRequest" asp-action="Index">Xem đơn chờ</a>
+                </div>
+
+                @if (notificationCount > 0)
+                {
+                    foreach (var item in pendingLeaves)
+                    {
+                        <a class="notification-item unread" asp-controller="LeaveRequest" asp-action="Details" asp-route-id="@item.Id">
+                            <span class="notification-icon notification-icon-warning">
+                                <i class="fa-solid fa-umbrella-beach" aria-hidden="true"></i>
+                            </span>
+                            <span>
+                                <span class="notification-text d-block">@item.Employee?.FullName đã gửi đơn nghỉ phép</span>
+                                <span class="notification-time">@TimeAgo(item.CreatedAt)</span>
+                            </span>
+                        </a>
+                    }
+
+                    foreach (var item in recentReviews)
+                    {
+                        <a class="notification-item" asp-controller="Performance" asp-action="Details" asp-route-id="@item.Id">
+                            <span class="notification-icon notification-icon-accent">
+                                <i class="fa-solid fa-star" aria-hidden="true"></i>
+                            </span>
+                            <span>
+                                <span class="notification-text d-block">Đánh giá mới cho @item.Employee?.FullName</span>
+                                <span class="notification-time">@TimeAgo(item.CreatedAt)</span>
+                            </span>
+                        </a>
+                    }
+                }
+                else
+                {
+                    <div class="empty-state py-4">
+                        <i class="fa-regular fa-bell-slash fa-2x" aria-hidden="true"></i>
+                        <h5 class="mb-0">Không có thông báo mới</h5>
+                    </div>
+                }
+
+                <div class="notification-footer">
+                    <a asp-controller="LeaveRequest" asp-action="Index">Xem tất cả</a>
+                </div>
+            </div>
+        </div>
+
+        <button id="themeToggle" class="icon-btn" type="button" aria-label="Đổi chế độ giao diện">
+            <i class="fa-regular fa-moon" data-theme-icon aria-hidden="true"></i>
+        </button>
+
+        <div class="user-pill">
+            <span class="avatar" aria-hidden="true">A</span>
+            <span>Admin</span>
+        </div>
+    </div>
+</header>

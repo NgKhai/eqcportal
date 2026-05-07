@@ -1,0 +1,83 @@
+@model eqcportal.Models.Employee
+
+@{
+    ViewData["Title"] = "Chi tiết nhân viên";
+    ViewData["Breadcrumb"] = "Quản lý / Nhân viên / Chi tiết";
+
+    string GenderLabel(string? gender) => gender switch
+    {
+        "Male" => "Nam",
+        "Female" => "Nữ",
+        "Other" => "Khác",
+        null or "" => "Chưa cập nhật",
+        _ => gender
+    };
+}
+
+<section class="profile-header eqc-card">
+    @if (!string.IsNullOrWhiteSpace(Model.ProfilePhotoPath))
+    {
+        <img class="employee-avatar-lg" src="@Model.ProfilePhotoPath" alt="Ảnh @Model.FullName" />
+    }
+    else
+    {
+        <span class="employee-avatar-lg avatar-fallback">@Model.FullName.Substring(0, 1).ToUpper()</span>
+    }
+
+    <div class="profile-summary">
+        <h1>@Model.FullName</h1>
+        <p>@Model.Position?.Title</p>
+        <div class="profile-badges">
+            <span class="eqc-badge badge-primary">@Model.Department?.Name</span>
+            <span class="eqc-badge @(Model.IsActive ? "badge-success" : "badge-muted")">
+                @(Model.IsActive ? "Đang hoạt động" : "Ngưng hoạt động")
+            </span>
+        </div>
+    </div>
+</section>
+
+<section class="eqc-card details-card">
+    <h2>Thông tin nhân viên</h2>
+    <div class="info-grid">
+        <div>
+            <span>Email</span>
+            <strong>@Model.Email</strong>
+        </div>
+        <div>
+            <span>SĐT</span>
+            <strong>@(string.IsNullOrWhiteSpace(Model.Phone) ? "Chưa cập nhật" : Model.Phone)</strong>
+        </div>
+        <div>
+            <span>Ngày sinh</span>
+            <strong>@(Model.DateOfBirth.HasValue ? Model.DateOfBirth.Value.ToString("dd/MM/yyyy") : "Chưa cập nhật")</strong>
+        </div>
+        <div>
+            <span>Giới tính</span>
+            <strong>@GenderLabel(Model.Gender)</strong>
+        </div>
+        <div>
+            <span>Ngày vào làm</span>
+            <strong>@Model.HireDate.ToString("dd/MM/yyyy")</strong>
+        </div>
+        <div>
+            <span>Lương</span>
+            <strong>@(Model.Salary.HasValue ? $"{Model.Salary.Value:N0} VNĐ" : "Chưa cập nhật")</strong>
+        </div>
+        <div class="grid-full">
+            <span>Địa chỉ</span>
+            <strong>@(string.IsNullOrWhiteSpace(Model.Address) ? "Chưa cập nhật" : Model.Address)</strong>
+        </div>
+    </div>
+</section>
+
+<div class="details-actions">
+    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.Id">
+        <i class="fa-regular fa-pen-to-square me-1" aria-hidden="true"></i>
+        Chỉnh sửa
+    </a>
+    <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+    <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@Model.Id">
+        <i class="fa-regular fa-trash-can me-1" aria-hidden="true"></i>
+        Xóa
+    </a>
+</div>

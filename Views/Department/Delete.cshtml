@@ -1,0 +1,53 @@
+@model eqcportal.Models.Department
+
+@{
+    ViewData["Title"] = "Xóa phòng ban";
+    ViewData["Breadcrumb"] = "Quản lý / Phòng ban / Xóa";
+}
+
+<section class="page-heading">
+    <h1>Xóa phòng ban</h1>
+    <p>Kiểm tra thông tin trước khi xóa phòng ban khỏi danh sách hoạt động.</p>
+</section>
+
+<section class="eqc-card form-card">
+    <div class="delete-summary">
+        <span class="delete-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
+        <div>
+            <h2>@Model.Name</h2>
+            <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "Chưa có mô tả" : Model.Description)</p>
+            <span class="eqc-badge badge-primary">@Model.Employees.Count nhân viên</span>
+        </div>
+    </div>
+
+    <form id="deleteForm" asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-actions">
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                <i class="fa-regular fa-trash-can me-1" aria-hidden="true"></i>
+                Xóa
+            </button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            Swal.fire({
+                title: 'Bạn có chắc chắn không?',
+                text: 'Hành động này không thể hoàn tác!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteForm').submit();
+                }
+            });
+        }
+    </script>
+}

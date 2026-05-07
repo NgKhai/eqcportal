@@ -1,0 +1,14 @@
+@model string?
+
+<div class="empty-state">
+    <i class="fa-regular fa-folder-open fa-3x" aria-hidden="true"></i>
+    <h5>Không tìm thấy dữ liệu</h5>
+    <p class="small">Thử thay đổi bộ lọc hoặc thêm bản ghi mới</p>
+    @if (!string.IsNullOrWhiteSpace(Model))
+    {
+        <a href="@Model" class="btn btn-outline-primary btn-sm">
+            <i class="fa-solid fa-plus me-1" aria-hidden="true"></i>
+            Thêm mới
+        </a>
+    }
+</div>

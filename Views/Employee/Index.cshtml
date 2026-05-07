@@ -1,0 +1,136 @@
+@model eqcportal.Models.ViewModels.EmployeeFilterViewModel
+
+@{
+    ViewData["Title"] = "Danh sách nhân viên";
+    ViewData["Breadcrumb"] = "Quản lý / Nhân viên";
+}
+
+<section class="page-heading page-heading-row">
+    <div>
+        <h1>Nhân viên</h1>
+        <p>Quản lý hồ sơ nhân viên, phòng ban, chức vụ và trạng thái làm việc.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create">
+        <i class="fa-solid fa-user-plus me-1" aria-hidden="true"></i>
+        Thêm nhân viên
+    </a>
+</section>
+
+<section class="eqc-card filter-card">
+    <form asp-action="Index" method="get" class="filter-grid">
+        <div class="search-field">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input asp-for="SearchName" class="form-control" placeholder="Tìm kiếm..." />
+        </div>
+        <select asp-for="DepartmentId" class="form-select">
+            <option value="">Tất cả phòng ban</option>
+            @foreach (var department in Model.Departments)
+            {
+                <option value="@department.Id">@department.Name</option>
+            }
+        </select>
+        <select asp-for="IsActive" class="form-select">
+            <option value="">Tất cả trạng thái</option>
+            <option value="true">Đang hoạt động</option>
+            <option value="false">Ngưng hoạt động</option>
+        </select>
+        <div class="filter-actions">
+            <button class="btn btn-primary" type="submit">
+                <i class="fa-solid fa-filter me-1" aria-hidden="true"></i>
+                Lọc
+            </button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Đặt lại</a>
+        </div>
+    </form>
+</section>
+
+<section class="eqc-card table-card">
+    @if (Model.Employees.Any())
+    {
+        <div class="table-responsive">
+            <table class="table eqc-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>Phòng ban</th>
+                        <th>Chức vụ</th>
+                        <th>Ngày vào</th>
+                        <th>Lương</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Employees)
+                    {
+                        <tr>
+                            <td>
+                                <div class="employee-cell">
+                                    @if (!string.IsNullOrWhiteSpace(item.ProfilePhotoPath))
+                                    {
+                                        <img class="employee-avatar-sm" src="@item.ProfilePhotoPath" alt="Ảnh @item.FullName" />
+                                    }
+                                    else
+                                    {
+                                        <span class="employee-avatar-sm avatar-fallback">@item.FullName.Substring(0, 1).ToUpper()</span>
+                                    }
+                                    <span class="table-title">@item.FullName</span>
+                                </div>
+                            </td>
+                            <td class="text-secondary">@item.Email</td>
+                            <td>@item.Department?.Name</td>
+                            <td>@item.Position?.Title</td>
+                            <td>@item.HireDate.ToString("dd/MM/yyyy")</td>
+                            <td>@(item.Salary.HasValue ? $"{item.Salary.Value:N0} VNĐ" : "Chưa cập nhật")</td>
+                            <td>
+                                <span class="eqc-badge @(item.IsActive ? "badge-success" : "badge-muted")">
+                                    @(item.IsActive ? "Đang hoạt động" : "Ngưng hoạt động")
+                                </span>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" aria-label="Chi tiết @item.FullName">
+                                        <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                    <a class="icon-btn" asp-action="Edit" asp-route-id="@item.Id" aria-label="Chỉnh sửa @item.FullName">
+                                        <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
+                                    </a>
+                                    <a class="icon-btn danger" asp-action="Delete" asp-route-id="@item.Id" aria-label="Xóa @item.FullName">
+                                        <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar">
+            <span>Hiển thị @Model.StartItem-@Model.EndItem / @Model.TotalCount</span>
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Phân trang nhân viên">
+                    <ul class="pagination eqc-pagination mb-0">
+                        @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                        {
+                            <li class="page-item @(pageNumber == Model.Page ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-page="@pageNumber"
+                                   asp-route-searchName="@Model.SearchName"
+                                   asp-route-departmentId="@Model.DepartmentId"
+                                   asp-route-isActive="@Model.IsActive">@pageNumber</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync("_EmptyState", Url.Action("Create", "Employee"))
+    }
+</section>

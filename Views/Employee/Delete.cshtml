@@ -1,0 +1,66 @@
+@model eqcportal.Models.Employee
+
+@{
+    ViewData["Title"] = "Xóa nhân viên";
+    ViewData["Breadcrumb"] = "Quản lý / Nhân viên / Xóa";
+}
+
+<section class="page-heading">
+    <h1>Xóa nhân viên</h1>
+    <p>Kiểm tra hồ sơ trước khi xóa nhân viên khỏi danh sách hoạt động.</p>
+</section>
+
+<section class="eqc-card form-card">
+    <div class="delete-summary">
+        <span class="delete-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
+        <div class="delete-employee">
+            <div class="employee-cell mb-2">
+                @if (!string.IsNullOrWhiteSpace(Model.ProfilePhotoPath))
+                {
+                    <img class="employee-avatar-sm" src="@Model.ProfilePhotoPath" alt="Ảnh @Model.FullName" />
+                }
+                else
+                {
+                    <span class="employee-avatar-sm avatar-fallback">@Model.FullName.Substring(0, 1).ToUpper()</span>
+                }
+                <h2>@Model.FullName</h2>
+            </div>
+            <p>@Model.Email</p>
+            <div class="profile-badges">
+                <span class="eqc-badge badge-primary">@Model.Department?.Name</span>
+                <span class="eqc-badge badge-primary">@Model.Position?.Title</span>
+            </div>
+        </div>
+    </div>
+
+    <form id="deleteForm" asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-actions">
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                <i class="fa-regular fa-trash-can me-1" aria-hidden="true"></i>
+                Xóa
+            </button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            Swal.fire({
+                title: 'Bạn có chắc chắn không?',
+                text: 'Hành động này không thể hoàn tác!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteForm').submit();
+                }
+            });
+        }
+    </script>
+}

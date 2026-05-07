@@ -1,0 +1,99 @@
+@model eqcportal.Models.LeaveRequest
+
+@{
+    ViewData["Title"] = "Chi tiết đơn nghỉ phép";
+    ViewData["Breadcrumb"] = "Vận hành HR / Đơn xin nghỉ phép / Chi tiết";
+}
+
+<section class="page-heading">
+    <h1>Chi tiết đơn nghỉ phép</h1>
+    <p>Theo dõi thông tin đơn nghỉ phép và xử lý phê duyệt ngay trên màn hình này.</p>
+</section>
+
+<section class="eqc-card details-card">
+    <div class="leave-detail-header">
+        <div>
+            <h2>@Model.Employee?.FullName</h2>
+            <p>@Model.LeaveType</p>
+        </div>
+        <span class="eqc-badge @LeaveBadgeClass(Model.Status)">@Model.Status</span>
+    </div>
+
+    <div class="info-grid">
+        <div>
+            <span>Nhân viên</span>
+            <strong>@Model.Employee?.FullName</strong>
+        </div>
+        <div>
+            <span>Loại nghỉ</span>
+            <strong>@Model.LeaveType</strong>
+        </div>
+        <div>
+            <span>Từ ngày</span>
+            <strong>@Model.StartDate.ToString("dd/MM/yyyy")</strong>
+        </div>
+        <div>
+            <span>Đến ngày</span>
+            <strong>@Model.EndDate.ToString("dd/MM/yyyy")</strong>
+        </div>
+        <div>
+            <span>Số ngày</span>
+            <strong>@Model.TotalDays ngày</strong>
+        </div>
+        <div>
+            <span>Ngày gửi</span>
+            <strong>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</strong>
+        </div>
+        <div class="grid-full">
+            <span>Lý do</span>
+            <strong>@(string.IsNullOrWhiteSpace(Model.Reason) ? "Không có ghi chú" : Model.Reason)</strong>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.AdminComment) || Model.Status != "Chờ duyệt")
+        {
+            <div class="grid-full">
+                <span>Phản hồi quản trị</span>
+                <strong>@(string.IsNullOrWhiteSpace(Model.AdminComment) ? "Không có phản hồi" : Model.AdminComment)</strong>
+            </div>
+        }
+    </div>
+</section>
+
+@if (Model.Status == "Chờ duyệt")
+{
+    <section class="eqc-card form-card mt-3">
+        <form asp-action="Process" method="post">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <div class="mb-3">
+                <label for="adminComment" class="form-label">Phản hồi quản trị</label>
+                <textarea id="adminComment" name="adminComment" class="form-control" rows="4" placeholder="Nhập phản hồi hoặc ghi chú cho quyết định này"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success" name="actionType" value="approve">
+                    <i class="fa-solid fa-check me-1" aria-hidden="true"></i>
+                    Duyệt
+                </button>
+                <button type="submit" class="btn btn-danger" name="actionType" value="reject">
+                    <i class="fa-solid fa-xmark me-1" aria-hidden="true"></i>
+                    Từ chối
+                </button>
+                <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+            </div>
+        </form>
+    </section>
+}
+else
+{
+    <div class="details-actions">
+        <a class="btn btn-outline-secondary" asp-action="Index">Quay lại danh sách</a>
+    </div>
+}
+
+@functions {
+    private static string LeaveBadgeClass(string status) => status switch
+    {
+        "Đã duyệt" => "badge-success",
+        "Từ chối" => "badge-danger",
+        "Chờ duyệt" => "badge-warning badge-pulse",
+        _ => "badge-muted"
+    };
+}

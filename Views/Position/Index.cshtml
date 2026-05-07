@@ -1,0 +1,63 @@
+@model IEnumerable<eqcportal.Models.Position>
+
+@{
+    ViewData["Title"] = "Danh sách chức vụ";
+    ViewData["Breadcrumb"] = "Quản lý / Chức vụ";
+}
+
+<section class="page-heading page-heading-row">
+    <div>
+        <h1>Chức vụ</h1>
+        <p>Quản lý danh sách chức vụ và số nhân viên đang đảm nhiệm từng vai trò.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create">
+        <i class="fa-solid fa-plus me-1" aria-hidden="true"></i>
+        Thêm chức vụ
+    </a>
+</section>
+
+<section class="eqc-card table-card">
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table eqc-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Tên chức vụ</th>
+                        <th>Mô tả</th>
+                        <th class="text-center">Số nhân viên</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="table-title">@item.Title</div>
+                            </td>
+                            <td class="text-secondary">@(string.IsNullOrWhiteSpace(item.Description) ? "Chưa có mô tả" : item.Description)</td>
+                            <td class="text-center">
+                                <span class="eqc-badge badge-primary">@item.Employees.Count nhân viên</span>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-btn" asp-action="Edit" asp-route-id="@item.Id" aria-label="Chỉnh sửa @item.Title">
+                                        <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
+                                    </a>
+                                    <a class="icon-btn danger" asp-action="Delete" asp-route-id="@item.Id" aria-label="Xóa @item.Title">
+                                        <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync("_EmptyState", Url.Action("Create", "Position"))
+    }
+</section>

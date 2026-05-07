@@ -1,0 +1,136 @@
+@model eqcportal.Models.ViewModels.AttendanceFilterViewModel
+
+@{
+    ViewData["Title"] = "Chấm công";
+    ViewData["Breadcrumb"] = "Vận hành HR / Chấm công";
+}
+
+<section class="page-heading page-heading-row">
+    <div>
+        <h1>Chấm công</h1>
+        <p>Theo dõi dữ liệu chấm công theo ngày, nhân viên và trạng thái đi làm.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create">
+        <i class="fa-solid fa-plus me-1" aria-hidden="true"></i>
+        Chấm công
+    </a>
+</section>
+
+<section class="eqc-card filter-card">
+    <form asp-action="Index" method="get" class="filter-grid attendance-filter-grid">
+        <div>
+            <label class="form-label" for="DateFrom">Từ ngày</label>
+            <input asp-for="DateFrom" class="form-control" />
+        </div>
+        <div>
+            <label class="form-label" for="DateTo">Đến ngày</label>
+            <input asp-for="DateTo" class="form-control" />
+        </div>
+        <div>
+            <label class="form-label" for="EmployeeId">Nhân viên</label>
+            <select asp-for="EmployeeId" class="form-select">
+                <option value="">Tất cả nhân viên</option>
+                @foreach (var employee in Model.Employees)
+                {
+                    <option value="@employee.Id">@employee.FullName</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label class="form-label" for="Status">Trạng thái</label>
+            <select asp-for="Status" class="form-select">
+                <option value="">Tất cả trạng thái</option>
+                <option value="Có mặt">Có mặt</option>
+                <option value="Vắng mặt">Vắng mặt</option>
+                <option value="Đi muộn">Đi muộn</option>
+                <option value="Nửa ngày">Nửa ngày</option>
+            </select>
+        </div>
+        <div class="filter-actions attendance-filter-actions">
+            <button class="btn btn-primary" type="submit">
+                <i class="fa-solid fa-filter me-1" aria-hidden="true"></i>
+                Lọc
+            </button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Đặt lại</a>
+            <a class="btn btn-outline-primary" asp-action="MonthlySummary">
+                <i class="fa-solid fa-chart-column me-1" aria-hidden="true"></i>
+                Báo cáo tháng
+            </a>
+        </div>
+    </form>
+</section>
+
+<section class="eqc-card table-card">
+    @if (Model.Attendances.Any())
+    {
+        <div class="table-responsive">
+            <table class="table eqc-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Nhân viên</th>
+                        <th>Ngày</th>
+                        <th>Giờ vào</th>
+                        <th>Giờ ra</th>
+                        <th>Tổng giờ</th>
+                        <th>Trạng thái</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Attendances)
+                    {
+                        <tr>
+                            <td><div class="table-title">@item.Employee?.FullName</div></td>
+                            <td>@item.Date.ToString("dd/MM/yyyy")</td>
+                            <td>@(item.CheckIn.HasValue ? item.CheckIn.Value.ToString(@"hh\:mm") : "-")</td>
+                            <td>@(item.CheckOut.HasValue ? item.CheckOut.Value.ToString(@"hh\:mm") : "-")</td>
+                            <td>@(item.TotalHours.HasValue ? $"{item.TotalHours.Value:N2} giờ" : "-")</td>
+                            <td>
+                                <span class="eqc-badge @AttendanceBadgeClass(item.Status)">@item.Status</span>
+                            </td>
+                            <td class="text-secondary">@(string.IsNullOrWhiteSpace(item.Note) ? "-" : item.Note)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar">
+            <span>Hiển thị @Model.StartItem-@Model.EndItem / @Model.TotalCount</span>
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Phân trang chấm công">
+                    <ul class="pagination eqc-pagination mb-0">
+                        @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                        {
+                            <li class="page-item @(pageNumber == Model.Page ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-page="@pageNumber"
+                                   asp-route-dateFrom="@(Model.DateFrom?.ToString("yyyy-MM-dd"))"
+                                   asp-route-dateTo="@(Model.DateTo?.ToString("yyyy-MM-dd"))"
+                                   asp-route-employeeId="@Model.EmployeeId"
+                                   asp-route-status="@Model.Status">@pageNumber</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync("_EmptyState", Url.Action("Create", "Attendance"))
+    }
+</section>
+
+@functions {
+    private static string AttendanceBadgeClass(string status) => status switch
+    {
+        "Có mặt" => "badge-success",
+        "Vắng mặt" => "badge-danger",
+        "Đi muộn" => "badge-warning",
+        "Nửa ngày" => "badge-primary",
+        _ => "badge-muted"
+    };
+}

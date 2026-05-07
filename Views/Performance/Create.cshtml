@@ -1,0 +1,122 @@
+@model eqcportal.Models.PerformanceReview
+
+@{
+    ViewData["Title"] = "Tạo đánh giá";
+    ViewData["Breadcrumb"] = "Vận hành HR / Đánh giá hiệu suất / Tạo mới";
+}
+
+<section class="page-heading">
+    <h1>Tạo đánh giá</h1>
+    <p>Chấm điểm hiệu suất theo 4 tiêu chí và lưu nhận xét cho từng nhân viên.</p>
+</section>
+
+<section class="eqc-card form-card performance-form-card">
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="form-grid-2">
+            <div>
+                <label asp-for="EmployeeId" class="form-label"></label>
+                <select asp-for="EmployeeId" asp-items="ViewBag.Employees" class="form-select">
+                    <option value="">Chọn nhân viên</option>
+                </select>
+                <span asp-validation-for="EmployeeId" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="ReviewPeriod" class="form-label"></label>
+                <input asp-for="ReviewPeriod" class="form-control" placeholder="Ví dụ: Q2 2026" />
+                <span asp-validation-for="ReviewPeriod" class="text-danger small"></span>
+            </div>
+            <div class="grid-full">
+                <label asp-for="ReviewerName" class="form-label"></label>
+                <input asp-for="ReviewerName" class="form-control" placeholder="Nhập tên người đánh giá" />
+                <span asp-validation-for="ReviewerName" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="performance-score-grid">
+            <div class="score-control">
+                <div class="score-label-row">
+                    <label asp-for="TeamworkScore" class="form-label mb-0"></label>
+                    <strong id="TeamworkScoreValue" class="score-value-display">@Model.TeamworkScore</strong>
+                </div>
+                <input asp-for="TeamworkScore" class="form-range performance-range" type="range" min="1" max="5" step="1" data-score-target="TeamworkScoreValue" />
+                <span asp-validation-for="TeamworkScore" class="text-danger small"></span>
+            </div>
+            <div class="score-control">
+                <div class="score-label-row">
+                    <label asp-for="SkillScore" class="form-label mb-0"></label>
+                    <strong id="SkillScoreValue" class="score-value-display">@Model.SkillScore</strong>
+                </div>
+                <input asp-for="SkillScore" class="form-range performance-range" type="range" min="1" max="5" step="1" data-score-target="SkillScoreValue" />
+                <span asp-validation-for="SkillScore" class="text-danger small"></span>
+            </div>
+            <div class="score-control">
+                <div class="score-label-row">
+                    <label asp-for="PunctualityScore" class="form-label mb-0"></label>
+                    <strong id="PunctualityScoreValue" class="score-value-display">@Model.PunctualityScore</strong>
+                </div>
+                <input asp-for="PunctualityScore" class="form-range performance-range" type="range" min="1" max="5" step="1" data-score-target="PunctualityScoreValue" />
+                <span asp-validation-for="PunctualityScore" class="text-danger small"></span>
+            </div>
+            <div class="score-control">
+                <div class="score-label-row">
+                    <label asp-for="AttitudeScore" class="form-label mb-0"></label>
+                    <strong id="AttitudeScoreValue" class="score-value-display">@Model.AttitudeScore</strong>
+                </div>
+                <input asp-for="AttitudeScore" class="form-range performance-range" type="range" min="1" max="5" step="1" data-score-target="AttitudeScoreValue" />
+                <span asp-validation-for="AttitudeScore" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="overall-rating-panel">
+            <span class="overall-rating-label">Tổng điểm</span>
+            <div class="overall-rating-value">
+                <i class="fa-solid fa-star" aria-hidden="true"></i>
+                <strong id="OverallRatingDisplay">@Model.OverallRating.ToString("N2")</strong>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <label asp-for="Comment" class="form-label"></label>
+            <textarea asp-for="Comment" class="form-control" rows="4" placeholder="Nhập nhận xét cho kỳ đánh giá này"></textarea>
+            <span asp-validation-for="Comment" class="text-danger small"></span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-regular fa-paper-plane me-1" aria-hidden="true"></i>
+                Gửi đánh giá
+            </button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (function () {
+            const ranges = Array.from(document.querySelectorAll('.performance-range'));
+            const overall = document.getElementById('OverallRatingDisplay');
+
+            function updateOverall() {
+                const values = ranges.map(range => Number(range.value));
+                const sum = values.reduce((acc, value) => acc + value, 0);
+                const average = (sum / values.length).toFixed(2);
+                overall.textContent = average;
+
+                ranges.forEach(range => {
+                    const targetId = range.getAttribute('data-score-target');
+                    const target = targetId ? document.getElementById(targetId) : null;
+                    if (target) {
+                        target.textContent = range.value;
+                    }
+                });
+            }
+
+            ranges.forEach(range => range.addEventListener('input', updateOverall));
+            updateOverall();
+        })();
+    </script>
+}

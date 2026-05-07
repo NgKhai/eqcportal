@@ -1,0 +1,53 @@
+@{
+    var controller = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "Home");
+    string Active(string name) => string.Equals(controller, name, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+
+<aside id="appSidebar" class="app-sidebar" aria-label="Điều hướng chính">
+    <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
+        <span class="brand-mark" aria-hidden="true"><i class="fa-solid fa-diamond"></i></span>
+        <span class="brand-text">EQC Portal</span>
+    </a>
+
+    <nav>
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Chính</div>
+            <a class="sidebar-link @Active("Home")" asp-controller="Home" asp-action="Index">
+                <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+                <span>Bảng điều khiển</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Quản lý</div>
+            <a class="sidebar-link @Active("Employee")" asp-controller="Employee" asp-action="Index">
+                <i class="fa-solid fa-users" aria-hidden="true"></i>
+                <span>Nhân viên</span>
+            </a>
+            <a class="sidebar-link @Active("Department")" asp-controller="Department" asp-action="Index">
+                <i class="fa-solid fa-building" aria-hidden="true"></i>
+                <span>Phòng ban</span>
+            </a>
+            <a class="sidebar-link @Active("Position")" asp-controller="Position" asp-action="Index">
+                <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
+                <span>Chức vụ</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Vận hành HR</div>
+            <a class="sidebar-link @Active("LeaveRequest")" asp-controller="LeaveRequest" asp-action="Index">
+                <i class="fa-solid fa-umbrella-beach" aria-hidden="true"></i>
+                <span>Đơn xin nghỉ phép</span>
+            </a>
+            <a class="sidebar-link @Active("Attendance")" asp-controller="Attendance" asp-action="Index">
+                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                <span>Chấm công</span>
+            </a>
+            <a class="sidebar-link @Active("Performance")" asp-controller="Performance" asp-action="Index">
+                <i class="fa-solid fa-star-half-stroke" aria-hidden="true"></i>
+                <span>Đánh giá hiệu suất</span>
+            </a>
+        </div>
+    </nav>
+</aside>

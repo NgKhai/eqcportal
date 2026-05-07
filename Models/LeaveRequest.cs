@@ -6,33 +6,36 @@ namespace eqcportal.Models
     {
         public int Id { get; set; }
 
-        [Required]
-        [Display(Name = "Employee")]
+        [Required(ErrorMessage = "Vui lòng chọn nhân viên")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn nhân viên")]
+        [Display(Name = "Nhân viên")]
         public int EmployeeId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn ngày bắt đầu")]
         [DataType(DataType.Date)]
-        [Display(Name = "Start Date")]
+        [Display(Name = "Từ ngày")]
         public DateTime StartDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn ngày kết thúc")]
         [DataType(DataType.Date)]
-        [Display(Name = "End Date")]
+        [Display(Name = "Đến ngày")]
         public DateTime EndDate { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        [Display(Name = "Leave Type")]
-        public string LeaveType { get; set; } = "Annual"; // Annual, Sick, Personal, Maternity, Other
+        [Required(ErrorMessage = "Vui lòng chọn loại nghỉ")]
+        [StringLength(50, ErrorMessage = "Loại nghỉ không được vượt quá 50 ký tự")]
+        [Display(Name = "Loại nghỉ")]
+        public string LeaveType { get; set; } = "Nghỉ phép";
 
-        [StringLength(500)]
+        [StringLength(500, ErrorMessage = "Lý do không được vượt quá 500 ký tự")]
+        [Display(Name = "Lý do")]
         public string? Reason { get; set; }
 
         [StringLength(50)]
-        public string Status { get; set; } = "Pending"; // Pending, Approved, Rejected
+        [Display(Name = "Trạng thái")]
+        public string Status { get; set; } = "Chờ duyệt";
 
-        [StringLength(500)]
-        [Display(Name = "Admin Comment")]
+        [StringLength(500, ErrorMessage = "Phản hồi không được vượt quá 500 ký tự")]
+        [Display(Name = "Phản hồi quản trị")]
         public string? AdminComment { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;

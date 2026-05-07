@@ -6,45 +6,45 @@ namespace eqcportal.Models
     {
         public int Id { get; set; }
 
-        [Required]
-        [Display(Name = "Employee")]
+        [Required(ErrorMessage = "Vui lòng chọn nhân viên")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn nhân viên")]
+        [Display(Name = "Nhân viên")]
         public int EmployeeId { get; set; }
 
-        // 4 criteria scores (each 1-5)
-        [Required]
-        [Range(1, 5)]
-        [Display(Name = "Teamwork Score")]
+        [Required(ErrorMessage = "Vui lòng nhập điểm làm việc nhóm")]
+        [Range(1, 5, ErrorMessage = "Điểm phải từ 1 đến 5")]
+        [Display(Name = "Làm việc nhóm")]
         public int TeamworkScore { get; set; }
 
-        [Required]
-        [Range(1, 5)]
-        [Display(Name = "Skill Score")]
+        [Required(ErrorMessage = "Vui lòng nhập điểm kỹ năng")]
+        [Range(1, 5, ErrorMessage = "Điểm phải từ 1 đến 5")]
+        [Display(Name = "Kỹ năng")]
         public int SkillScore { get; set; }
 
-        [Required]
-        [Range(1, 5)]
-        [Display(Name = "Punctuality Score")]
+        [Required(ErrorMessage = "Vui lòng nhập điểm đúng giờ")]
+        [Range(1, 5, ErrorMessage = "Điểm phải từ 1 đến 5")]
+        [Display(Name = "Đúng giờ")]
         public int PunctualityScore { get; set; }
 
-        [Required]
-        [Range(1, 5)]
-        [Display(Name = "Attitude Score")]
+        [Required(ErrorMessage = "Vui lòng nhập điểm thái độ")]
+        [Range(1, 5, ErrorMessage = "Điểm phải từ 1 đến 5")]
+        [Display(Name = "Thái độ")]
         public int AttitudeScore { get; set; }
 
-        // Computed: average of 4 criteria (saved to DB)
-        [Display(Name = "Overall Rating")]
+        [Display(Name = "Tổng điểm")]
         public decimal OverallRating { get; set; }
 
-        [StringLength(1000)]
+        [StringLength(1000, ErrorMessage = "Nhận xét không được vượt quá 1000 ký tự")]
+        [Display(Name = "Nhận xét")]
         public string? Comment { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        [Display(Name = "Review Period")]
-        public string ReviewPeriod { get; set; } = string.Empty; // e.g. "Q1 2026", "April 2026"
+        [Required(ErrorMessage = "Vui lòng nhập kỳ đánh giá")]
+        [StringLength(50, ErrorMessage = "Kỳ đánh giá không được vượt quá 50 ký tự")]
+        [Display(Name = "Kỳ đánh giá")]
+        public string ReviewPeriod { get; set; } = string.Empty;
 
-        [StringLength(150)]
-        [Display(Name = "Reviewer Name")]
+        [StringLength(150, ErrorMessage = "Người đánh giá không được vượt quá 150 ký tự")]
+        [Display(Name = "Người đánh giá")]
         public string? ReviewerName { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;

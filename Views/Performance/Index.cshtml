@@ -1,0 +1,80 @@
+@model IEnumerable<eqcportal.Models.PerformanceReview>
+
+@{
+    ViewData["Title"] = "Đánh giá hiệu suất";
+    ViewData["Breadcrumb"] = "Vận hành HR / Đánh giá hiệu suất";
+}
+
+<section class="page-heading page-heading-row">
+    <div>
+        <h1>Đánh giá hiệu suất</h1>
+        <p>Theo dõi điểm đánh giá hiệu suất theo từng kỳ, từng nhân viên và người đánh giá.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create">
+        <i class="fa-solid fa-plus me-1" aria-hidden="true"></i>
+        Tạo đánh giá
+    </a>
+</section>
+
+<section class="eqc-card table-card">
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table eqc-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Nhân viên</th>
+                        <th>Kỳ đánh giá</th>
+                        <th>Làm việc nhóm</th>
+                        <th>Kỹ năng</th>
+                        <th>Đúng giờ</th>
+                        <th>Thái độ</th>
+                        <th>Tổng</th>
+                        <th>Người đánh giá</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><div class="table-title">@item.Employee?.FullName</div></td>
+                            <td>@item.ReviewPeriod</td>
+                            <td><span class="score-pill @ScoreClass(item.TeamworkScore)">@item.TeamworkScore</span></td>
+                            <td><span class="score-pill @ScoreClass(item.SkillScore)">@item.SkillScore</span></td>
+                            <td><span class="score-pill @ScoreClass(item.PunctualityScore)">@item.PunctualityScore</span></td>
+                            <td><span class="score-pill @ScoreClass(item.AttitudeScore)">@item.AttitudeScore</span></td>
+                            <td>
+                                <span class="overall-score">
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    @item.OverallRating.ToString("N2")
+                                </span>
+                            </td>
+                            <td>@(string.IsNullOrWhiteSpace(item.ReviewerName) ? "-" : item.ReviewerName)</td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" aria-label="Chi tiết đánh giá">
+                                        <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync("_EmptyState", Url.Action("Create", "Performance"))
+    }
+</section>
+
+@functions {
+    private static string ScoreClass(int score) => score switch
+    {
+        >= 4 => "score-good",
+        3 => "score-mid",
+        _ => "score-low"
+    };
+}

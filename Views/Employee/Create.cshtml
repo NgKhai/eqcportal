@@ -1,0 +1,108 @@
+@model eqcportal.Models.Employee
+
+@{
+    ViewData["Title"] = "Thêm nhân viên";
+    ViewData["Breadcrumb"] = "Quản lý / Nhân viên / Thêm mới";
+}
+
+<section class="page-heading">
+    <h1>Thêm nhân viên</h1>
+    <p>Tạo hồ sơ nhân viên mới với đầy đủ thông tin cá nhân và công việc.</p>
+</section>
+
+<section class="eqc-card form-card employee-form-card">
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="avatar-upload-wrap">
+            <label class="avatar-upload" for="profilePhoto">
+                <img id="avatarPreview" class="avatar-preview d-none" alt="Ảnh xem trước" />
+                <span class="avatar-placeholder">
+                    <i class="fa-regular fa-user" aria-hidden="true"></i>
+                </span>
+            </label>
+            <label for="profilePhoto" class="avatar-upload-label">Tải ảnh lên</label>
+            <input id="profilePhoto" name="profilePhoto" type="file" class="d-none" accept="image/png,image/jpeg,image/webp" />
+            <span asp-validation-for="ProfilePhotoPath" class="text-danger small"></span>
+        </div>
+
+        <div class="form-grid-2">
+            <div>
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" placeholder="Nhập họ và tên" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" placeholder="name@eqc.com" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="Phone" class="form-label"></label>
+                <input asp-for="Phone" class="form-control" placeholder="Nhập số điện thoại" />
+                <span asp-validation-for="Phone" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="DateOfBirth" class="form-label"></label>
+                <input asp-for="DateOfBirth" class="form-control" />
+                <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="Gender" class="form-label"></label>
+                <select asp-for="Gender" class="form-select">
+                    <option value="">Chọn giới tính</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                    <option value="Khác">Khác</option>
+                </select>
+                <span asp-validation-for="Gender" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="HireDate" class="form-label"></label>
+                <input asp-for="HireDate" class="form-control" />
+                <span asp-validation-for="HireDate" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="Salary" class="form-label"></label>
+                <input asp-for="Salary" class="form-control" type="number" min="0" step="100000" placeholder="Nhập lương" />
+                <span asp-validation-for="Salary" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="DepartmentId" class="form-label"></label>
+                <select asp-for="DepartmentId" asp-items="ViewBag.Departments" class="form-select">
+                    <option value="">Chọn phòng ban</option>
+                </select>
+                <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="PositionId" class="form-label"></label>
+                <select asp-for="PositionId" asp-items="ViewBag.Positions" class="form-select">
+                    <option value="">Chọn chức vụ</option>
+                </select>
+                <span asp-validation-for="PositionId" class="text-danger small"></span>
+            </div>
+            <div class="form-switch-field">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label"></label>
+            </div>
+            <div class="grid-full">
+                <label asp-for="Address" class="form-label"></label>
+                <textarea asp-for="Address" class="form-control" rows="3" placeholder="Nhập địa chỉ"></textarea>
+                <span asp-validation-for="Address" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-regular fa-floppy-disk me-1" aria-hidden="true"></i>
+                Lưu
+            </button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/avatar-upload.js" asp-append-version="true"></script>
+}

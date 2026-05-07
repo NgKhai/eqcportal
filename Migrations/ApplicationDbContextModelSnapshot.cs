@@ -183,6 +183,10 @@ namespace eqcportal.Migrations
                     b.Property<int>("PositionId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ProfilePhotoPath")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.Property<decimal?>("Salary")
                         .HasColumnType("decimal(18,2)");
 

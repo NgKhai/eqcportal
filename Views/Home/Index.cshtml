@@ -1,8 +1,125 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@using System.Text.Json
+@model eqcportal.Models.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Bảng điều khiển";
+    ViewData["Breadcrumb"] = "Chính / Bảng điều khiển";
+
+    var chartPayload = new
+    {
+        employeesByDepartment = Model.EmployeesByDepartment,
+        employeesByGender = Model.EmployeesByGender,
+        attendanceByMonth = Model.AttendanceByMonth,
+        leaveRequestsByStatus = Model.LeaveRequestsByStatus
+    };
+
+    var chartJson = JsonSerializer.Serialize(chartPayload, new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    });
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="page-heading">
+    <h1>Bảng điều khiển</h1>
+    <p>Tổng quan nhanh về nhân sự, phòng ban, nghỉ phép và chấm công hôm nay.</p>
+</section>
+
+<section class="kpi-grid" aria-label="Chỉ số tổng quan">
+    <article class="eqc-card eqc-card-hover kpi-card">
+        <span class="kpi-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
+        <div>
+            <p class="kpi-value" data-countup="@Model.TotalEmployees">@Model.TotalEmployees</p>
+            <p class="kpi-label">Tổng nhân viên</p>
+        </div>
+    </article>
+
+    <article class="eqc-card eqc-card-hover kpi-card">
+        <span class="kpi-icon"><i class="fa-solid fa-building" aria-hidden="true"></i></span>
+        <div>
+            <p class="kpi-value" data-countup="@Model.TotalDepartments">@Model.TotalDepartments</p>
+            <p class="kpi-label">Tổng phòng ban</p>
+        </div>
+    </article>
+
+    <article class="eqc-card eqc-card-hover kpi-card">
+        <span class="kpi-icon"><i class="fa-solid fa-umbrella-beach" aria-hidden="true"></i></span>
+        <div>
+            <p class="kpi-value" data-countup="@Model.PendingLeaves">@Model.PendingLeaves</p>
+            <p class="kpi-label">Nghỉ phép chờ duyệt</p>
+        </div>
+    </article>
+
+    <article class="eqc-card eqc-card-hover kpi-card">
+        <span class="kpi-icon"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i></span>
+        <div>
+            <p class="kpi-value" data-countup="@Model.PresentToday">@Model.PresentToday</p>
+            <p class="kpi-label">Có mặt hôm nay</p>
+        </div>
+    </article>
+</section>
+
+<section class="eqc-card quick-actions-card" aria-labelledby="quickActionsTitle">
+    <h2 id="quickActionsTitle">Thao tác nhanh</h2>
+    @await Html.PartialAsync("_QuickActions")
+</section>
+
+<section class="dashboard-chart-grid" aria-label="Biểu đồ tổng quan">
+    <article class="eqc-card chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h2>Nhân viên theo phòng ban</h2>
+                <p>Phân bổ nhân sự hiện tại</p>
+            </div>
+            <span class="chart-chip"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i></span>
+        </div>
+        <div class="chart-canvas-wrap">
+            <canvas id="employeesByDepartmentChart"></canvas>
+        </div>
+    </article>
+
+    <article class="eqc-card chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h2>Phân bố giới tính</h2>
+                <p>Tỷ lệ nhân viên theo giới tính</p>
+            </div>
+            <span class="chart-chip"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i></span>
+        </div>
+        <div class="chart-canvas-wrap">
+            <canvas id="employeesByGenderChart"></canvas>
+        </div>
+    </article>
+
+    <article class="eqc-card chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h2>Chấm công theo tháng</h2>
+                <p>Số bản ghi trong 6 tháng gần nhất</p>
+            </div>
+            <span class="chart-chip"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span>
+        </div>
+        <div class="chart-canvas-wrap">
+            <canvas id="attendanceByMonthChart"></canvas>
+        </div>
+    </article>
+
+    <article class="eqc-card chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h2>Trạng thái nghỉ phép</h2>
+                <p>Tổng hợp đơn nghỉ phép</p>
+            </div>
+            <span class="chart-chip"><i class="fa-solid fa-circle-notch" aria-hidden="true"></i></span>
+        </div>
+        <div class="chart-canvas-wrap">
+            <canvas id="leaveRequestsByStatusChart"></canvas>
+        </div>
+    </article>
+</section>
+
+@section Scripts {
+    <script>
+        window.eqcDashboardCharts = @Html.Raw(chartJson);
+    </script>
+    <script src="~/js/charts.js" asp-append-version="true"></script>
+}

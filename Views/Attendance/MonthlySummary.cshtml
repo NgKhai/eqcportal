@@ -1,0 +1,87 @@
+@model eqcportal.Models.ViewModels.MonthlyAttendanceSummaryViewModel
+
+@{
+    ViewData["Title"] = "Báo cáo tháng";
+    ViewData["Breadcrumb"] = "Vận hành HR / Chấm công / Báo cáo tháng";
+}
+
+<section class="page-heading page-heading-row">
+    <div>
+        <h1>Báo cáo tháng</h1>
+        <p>Tổng hợp tình hình chấm công theo tháng để theo dõi ngày công và giờ làm việc.</p>
+    </div>
+    <a class="btn btn-outline-secondary" asp-action="Index">
+        <i class="fa-solid fa-arrow-left me-1" aria-hidden="true"></i>
+        Quay lại
+    </a>
+</section>
+
+<section class="eqc-card filter-card">
+    <form asp-action="MonthlySummary" method="get" class="monthly-summary-form">
+        <div>
+            <label class="form-label" for="month">Tháng</label>
+            <select id="month" name="month" class="form-select">
+                @for (var month = 1; month <= 12; month++)
+                {
+                    if (month == Model.Month)
+                    {
+                        <option value="@month" selected>@month</option>
+                    }
+                    else
+                    {
+                        <option value="@month">@month</option>
+                    }
+                }
+            </select>
+        </div>
+        <div>
+            <label class="form-label" for="year">Năm</label>
+            <input id="year" name="year" class="form-control" type="number" min="2000" max="2100" value="@Model.Year" />
+        </div>
+        <div class="filter-actions">
+            <button class="btn btn-primary" type="submit">
+                <i class="fa-solid fa-magnifying-glass me-1" aria-hidden="true"></i>
+                Xem báo cáo
+            </button>
+        </div>
+    </form>
+</section>
+
+<section class="eqc-card table-card">
+    @if (Model.Rows.Any())
+    {
+        <div class="table-responsive">
+            <table class="table eqc-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Nhân viên</th>
+                        <th>Có mặt</th>
+                        <th>Vắng</th>
+                        <th>Muộn</th>
+                        <th>Nửa ngày</th>
+                        <th>TB giờ/ngày</th>
+                        <th>Tổng giờ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        <tr>
+                            <td><div class="table-title">@row.EmployeeName</div></td>
+                            <td><span class="summary-chip summary-present">@row.PresentCount</span></td>
+                            <td><span class="summary-chip summary-absent">@row.AbsentCount</span></td>
+                            <td><span class="summary-chip summary-late">@row.LateCount</span></td>
+                            <td><span class="summary-chip summary-half">@row.HalfDayCount</span></td>
+                            <td>@row.AverageHoursPerDay.ToString("N2") giờ</td>
+                            <td>@row.TotalHours.ToString("N2") giờ</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync("_EmptyState", Url.Action("Create", "Attendance"))
+    }
+</section>

@@ -7,31 +7,35 @@ namespace eqcportal.Models
     {
         public int Id { get; set; }
 
-        [Required]
-        [Display(Name = "Employee")]
+        [Required(ErrorMessage = "Vui lòng chọn nhân viên")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn nhân viên")]
+        [Display(Name = "Nhân viên")]
         public int EmployeeId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn ngày chấm công")]
         [DataType(DataType.Date)]
+        [Display(Name = "Ngày")]
         public DateTime Date { get; set; } = DateTime.Today;
 
         [DataType(DataType.Time)]
-        [Display(Name = "Check In")]
+        [Display(Name = "Giờ vào")]
         public TimeSpan? CheckIn { get; set; }
 
         [DataType(DataType.Time)]
-        [Display(Name = "Check Out")]
+        [Display(Name = "Giờ ra")]
         public TimeSpan? CheckOut { get; set; }
 
         [Column(TypeName = "decimal(5,2)")]
-        [Display(Name = "Total Hours")]
-        public decimal? TotalHours { get; set; }  // Computed: CheckOut - CheckIn
+        [Display(Name = "Tổng giờ")]
+        public decimal? TotalHours { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string Status { get; set; } = "Present"; // Present, Absent, Late, HalfDay
+        [Required(ErrorMessage = "Vui lòng chọn trạng thái")]
+        [StringLength(50, ErrorMessage = "Trạng thái không được vượt quá 50 ký tự")]
+        [Display(Name = "Trạng thái")]
+        public string Status { get; set; } = "Có mặt";
 
-        [StringLength(300)]
+        [StringLength(300, ErrorMessage = "Ghi chú không được vượt quá 300 ký tự")]
+        [Display(Name = "Ghi chú")]
         public string? Note { get; set; }
 
         // Navigation property

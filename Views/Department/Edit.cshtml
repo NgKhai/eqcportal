@@ -1,0 +1,42 @@
+@model eqcportal.Models.Department
+
+@{
+    ViewData["Title"] = "Chỉnh sửa phòng ban";
+    ViewData["Breadcrumb"] = "Quản lý / Phòng ban / Chỉnh sửa";
+}
+
+<section class="page-heading">
+    <h1>Chỉnh sửa phòng ban</h1>
+    <p>Cập nhật tên và mô tả phòng ban.</p>
+</section>
+
+<section class="eqc-card form-card">
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" placeholder="Nhập tên phòng ban" />
+            <span asp-validation-for="Name" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Nhập mô tả phòng ban"></textarea>
+            <span asp-validation-for="Description" class="text-danger small"></span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-regular fa-floppy-disk me-1" aria-hidden="true"></i>
+                Lưu
+            </button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

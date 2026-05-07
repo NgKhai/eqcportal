@@ -1,0 +1,131 @@
+@model eqcportal.Models.PerformanceReview
+
+@{
+    ViewData["Title"] = "Chi tiết đánh giá";
+    ViewData["Breadcrumb"] = "Vận hành HR / Đánh giá hiệu suất / Chi tiết";
+}
+
+<section class="page-heading">
+    <h1>Chi tiết đánh giá</h1>
+    <p>Xem nhanh tổng điểm, từng tiêu chí và biểu đồ radar cho kỳ đánh giá này.</p>
+</section>
+
+<section class="performance-detail-header eqc-card">
+    <div>
+        <h2>@Model.Employee?.FullName</h2>
+        <p>@Model.ReviewPeriod</p>
+        <span class="text-secondary">Người đánh giá: @(string.IsNullOrWhiteSpace(Model.ReviewerName) ? "-" : Model.ReviewerName)</span>
+    </div>
+    <div class="overall-badge-large">
+        <i class="fa-solid fa-star" aria-hidden="true"></i>
+        <strong>@Model.OverallRating.ToString("N2")</strong>
+    </div>
+</section>
+
+<section class="performance-detail-grid">
+    <div class="eqc-card details-card">
+        <h2>Điểm đánh giá</h2>
+        <div class="info-grid performance-info-grid">
+            <div>
+                <span>Làm việc nhóm</span>
+                <strong>@Model.TeamworkScore / 5</strong>
+            </div>
+            <div>
+                <span>Kỹ năng</span>
+                <strong>@Model.SkillScore / 5</strong>
+            </div>
+            <div>
+                <span>Đúng giờ</span>
+                <strong>@Model.PunctualityScore / 5</strong>
+            </div>
+            <div>
+                <span>Thái độ</span>
+                <strong>@Model.AttitudeScore / 5</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="eqc-card details-card">
+        <h2>Biểu đồ radar</h2>
+        <div class="radar-chart-wrap">
+            <canvas id="performanceRadarChart" aria-label="Biểu đồ radar đánh giá hiệu suất"></canvas>
+        </div>
+    </div>
+</section>
+
+<section class="eqc-card details-card mt-3">
+    <h2>Nhận xét</h2>
+    <blockquote class="performance-comment">
+        @(string.IsNullOrWhiteSpace(Model.Comment) ? "Chưa có nhận xét cho kỳ đánh giá này." : Model.Comment)
+    </blockquote>
+</section>
+
+<div class="details-actions">
+    <a class="btn btn-outline-secondary" asp-action="Index">Quay lại danh sách</a>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const canvas = document.getElementById('performanceRadarChart');
+            if (!canvas || typeof Chart === 'undefined') {
+                return;
+            }
+
+            const styles = getComputedStyle(document.documentElement);
+            const primary = styles.getPropertyValue('--primary').trim() || '#4F46E5';
+            const border = styles.getPropertyValue('--border-light').trim() || '#E8EAED';
+            const text = styles.getPropertyValue('--text-secondary').trim() || '#5F6368';
+
+            new Chart(canvas, {
+                type: 'radar',
+                data: {
+                    labels: ['Làm việc nhóm', 'Kỹ năng', 'Đúng giờ', 'Thái độ'],
+                    datasets: [{
+                        label: 'Điểm đánh giá',
+                        data: [@Model.TeamworkScore, @Model.SkillScore, @Model.PunctualityScore, @Model.AttitudeScore],
+                        fill: true,
+                        backgroundColor: primary + '33',
+                        borderColor: primary,
+                        pointBackgroundColor: primary,
+                        pointBorderColor: primary,
+                        pointRadius: 4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                color: text,
+                                backdropColor: 'transparent'
+                            },
+                            grid: {
+                                color: border
+                            },
+                            angleLines: {
+                                color: border
+                            },
+                            pointLabels: {
+                                color: text,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })();
+    </script>
+}

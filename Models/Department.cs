@@ -6,12 +6,13 @@ namespace eqcportal.Models
     {
         public int Id { get; set; }
 
-        [Required]
-        [StringLength(100)]
-        [Display(Name = "Department Name")]
+        [Required(ErrorMessage = "Vui lòng nhập tên phòng ban")]
+        [StringLength(100, ErrorMessage = "Tên phòng ban không được vượt quá 100 ký tự")]
+        [Display(Name = "Tên phòng ban")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(500)]
+        [StringLength(500, ErrorMessage = "Mô tả không được vượt quá 500 ký tự")]
+        [Display(Name = "Mô tả")]
         public string? Description { get; set; }
 
         // Soft delete flag

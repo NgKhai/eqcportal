@@ -1,0 +1,121 @@
+@model eqcportal.Models.ViewModels.LeaveRequestFilterViewModel
+
+@{
+    ViewData["Title"] = "Đơn xin nghỉ phép";
+    ViewData["Breadcrumb"] = "Vận hành HR / Đơn xin nghỉ phép";
+}
+
+<section class="page-heading page-heading-row">
+    <div>
+        <h1>Đơn xin nghỉ phép</h1>
+        <p>Theo dõi danh sách đơn nghỉ phép, trạng thái duyệt và thời gian nghỉ của nhân viên.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create">
+        <i class="fa-solid fa-plus me-1" aria-hidden="true"></i>
+        Tạo đơn nghỉ phép
+    </a>
+</section>
+
+<section class="eqc-card filter-card">
+    <form asp-action="Index" method="get" class="filter-grid leave-filter-grid">
+        <div class="search-field">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input asp-for="SearchName" class="form-control" placeholder="Tìm kiếm nhân viên..." />
+        </div>
+        <select asp-for="Status" class="form-select">
+            <option value="">Tất cả trạng thái</option>
+            <option value="Chờ duyệt">Chờ duyệt</option>
+            <option value="Đã duyệt">Đã duyệt</option>
+            <option value="Từ chối">Từ chối</option>
+        </select>
+        <div class="filter-actions">
+            <button class="btn btn-primary" type="submit">
+                <i class="fa-solid fa-filter me-1" aria-hidden="true"></i>
+                Lọc
+            </button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Đặt lại</a>
+        </div>
+    </form>
+</section>
+
+<section class="eqc-card table-card">
+    @if (Model.LeaveRequests.Any())
+    {
+        <div class="table-responsive">
+            <table class="table eqc-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Nhân viên</th>
+                        <th>Loại nghỉ</th>
+                        <th>Từ ngày</th>
+                        <th>Đến ngày</th>
+                        <th>Số ngày</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.LeaveRequests)
+                    {
+                        <tr>
+                            <td>
+                                <div class="table-title">@item.Employee?.FullName</div>
+                            </td>
+                            <td>@item.LeaveType</td>
+                            <td>@item.StartDate.ToString("dd/MM/yyyy")</td>
+                            <td>@item.EndDate.ToString("dd/MM/yyyy")</td>
+                            <td>@item.TotalDays ngày</td>
+                            <td>
+                                <span class="eqc-badge @LeaveBadgeClass(item.Status)">
+                                    @item.Status
+                                </span>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" aria-label="Chi tiết đơn nghỉ phép">
+                                        <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar">
+            <span>Hiển thị @Model.StartItem-@Model.EndItem / @Model.TotalCount</span>
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Phân trang đơn nghỉ phép">
+                    <ul class="pagination eqc-pagination mb-0">
+                        @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                        {
+                            <li class="page-item @(pageNumber == Model.Page ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-page="@pageNumber"
+                                   asp-route-searchName="@Model.SearchName"
+                                   asp-route-status="@Model.Status">@pageNumber</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync("_EmptyState", Url.Action("Create", "LeaveRequest"))
+    }
+</section>
+
+@functions {
+    private static string LeaveBadgeClass(string status) => status switch
+    {
+        "Đã duyệt" => "badge-success",
+        "Từ chối" => "badge-danger",
+        "Chờ duyệt" => "badge-warning badge-pulse",
+        _ => "badge-muted"
+    };
+}
