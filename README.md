@@ -133,7 +133,7 @@ dotnet tool install --global dotnet-ef
 ### 1. Clone The Repository
 
 ```bash
-git clone https://github.com/your-username/eqcportal.git
+git clone https://github.com/NgKhai/eqcportal.git
 cd eqcportal
 ```
 
@@ -213,19 +213,6 @@ Add screenshots here before publishing the repository on GitHub:
 - Creating responsive admin-style UI with Bootstrap and custom CSS
 - Improving user experience with toasts, confirmation dialogs, filtering, pagination, and theme support
 
-## Roadmap
-
-Planned improvements are documented in `Docs/EQCPortal_UpgradeRecommendations.md`. Key future upgrades include:
-
-- Authentication and role-based authorization
-- Export to Excel or PDF for reports
-- Email notifications for leave requests
-- Advanced employee import and bulk actions
-- Audit logs for important HR actions
-- More detailed reporting and analytics
-- Automated tests for services, controllers, and validation rules
-- Deployment configuration for cloud hosting
-
 ## Status
 
 Core portfolio features are implemented through the main HR modules: dashboard, employees, departments, positions, leave requests, attendance, performance reviews, Cloudinary avatar uploads, and responsive UI polish.
@@ -234,7 +221,7 @@ This project is suitable as a portfolio/CV project and can be extended into a mo
 
 ## Author
 
-Created by **Your Name**.
+Created by **NgKhai**.
 
-- GitHub: `https://github.com/your-username`
-- LinkedIn: `https://linkedin.com/in/your-profile`
+- GitHub: `https://github.com/NgKhai`
+- LinkedIn: `https://linkedin.com/in/ngkhai`
