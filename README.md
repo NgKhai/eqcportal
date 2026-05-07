@@ -1,5 +1,33 @@
 # EQC Portal
 
+## Product Preview
+
+### Dashboard
+
+<img src="Screenshots/dashboard.png" alt="EQC Portal dashboard with KPI cards and analytics charts" width="100%">
+
+### Core HR Screens
+
+| Employee List | Employee Detail |
+| --- | --- |
+| <img src="Screenshots/employee_list.png" alt="Employee list with filters, search, pagination, and actions" width="100%"> | <img src="Screenshots/employee_detail.png" alt="Employee profile detail page with profile photo and employee information" width="100%"> |
+
+| Department Management | Position Management |
+| --- | --- |
+| <img src="Screenshots/department.png" alt="Department management page" width="100%"> | <img src="Screenshots/position.png" alt="Position management page" width="100%"> |
+
+### Workflow And Reporting
+
+| Leave Requests | Attendance |
+| --- | --- |
+| <img src="Screenshots/leave_request.png" alt="Leave request workflow page" width="100%"> | <img src="Screenshots/attendance.png" alt="Attendance management and tracking page" width="100%"> |
+
+| Performance List | Performance Detail |
+| --- | --- |
+| <img src="Screenshots/performance_list.png" alt="Performance review list page" width="100%"> | <img src="Screenshots/performance_detail.png" alt="Performance review detail page with radar chart" width="100%"> |
+
+## Overview
+
 EQC Portal is an internal HR and employee quality control portal built with ASP.NET Core MVC, Entity Framework Core, SQL Server, Bootstrap, Chart.js, and Cloudinary. It provides a practical employee management workflow with dashboard analytics, employee profiles, attendance tracking, leave requests, performance reviews, responsive UI, and light/dark theme support.
 
 This project was built as a portfolio-ready HR management system that demonstrates full-stack ASP.NET Core development, database modeling, CRUD workflows, file upload integration, dashboard reporting, and clean responsive UI implementation.
@@ -62,24 +90,24 @@ Performance reviews track multiple score categories such as productivity, qualit
 
 ```text
 eqcportal/
-├── Controllers/              # MVC controllers for each module
-├── Data/                     # EF Core DbContext
-├── Models/                   # Entity models, settings, and view models
-├── Services/                 # Application services such as Cloudinary upload
-├── Views/                    # Razor views and shared partials
-│   ├── Attendance/
-│   ├── Department/
-│   ├── Employee/
-│   ├── Home/
-│   ├── LeaveRequest/
-│   ├── Performance/
-│   ├── Position/
-│   └── Shared/
-├── wwwroot/
-│   ├── css/
-│   └── js/
-├── Migrations/               # EF Core database migrations
-└── Docs/                     # Planning, design, and improvement documents
+|-- Controllers/              # MVC controllers for each module
+|-- Data/                     # EF Core DbContext
+|-- Models/                   # Entity models, settings, and view models
+|-- Services/                 # Application services such as Cloudinary upload
+|-- Views/                    # Razor views and shared partials
+|   |-- Attendance/
+|   |-- Department/
+|   |-- Employee/
+|   |-- Home/
+|   |-- LeaveRequest/
+|   |-- Performance/
+|   |-- Position/
+|   `-- Shared/
+|-- wwwroot/
+|   |-- css/
+|   `-- js/
+|-- Migrations/               # EF Core database migrations
+`-- Docs/                     # Planning, design, and improvement documents
 ```
 
 ## Database Overview
@@ -191,16 +219,6 @@ Open the application in the browser:
 ```text
 http://localhost:5008
 ```
-
-## Screenshots
-
-Add screenshots here before publishing the repository on GitHub:
-
-- Dashboard analytics
-- Employee list and employee detail page
-- Leave request workflow
-- Attendance monthly summary
-- Performance review radar chart
 
 ## What This Project Demonstrates
 
