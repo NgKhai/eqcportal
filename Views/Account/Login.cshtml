@@ -1,0 +1,124 @@
+@model eqcportal.Models.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Đăng nhập";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập - EQC Portal</title>
+    <script>
+        (function () {
+            const saved = localStorage.getItem('eqc-theme');
+            const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/themes.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            padding: 1rem;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,.08);
+            padding: 2.5rem 2rem;
+            border: 1px solid var(--border-light);
+        }
+        .login-brand {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .login-brand .brand-mark {
+            width: 44px;
+            height: 44px;
+            border-radius: .75rem;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        .login-brand .brand-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -.02em;
+        }
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: .95rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-card">
+            <div class="login-brand">
+                <span class="brand-mark"><i class="fa-solid fa-diamond"></i></span>
+                <span class="brand-text">EQC Portal</span>
+            </div>
+            <p class="login-subtitle">Đăng nhập để tiếp tục</p>
+
+            <form asp-action="Login" method="post">
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-regular fa-envelope"></i></span>
+                        <input asp-for="Email" class="form-control" placeholder="email@eqc.com" autofocus />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        <input asp-for="Password" class="form-control" placeholder="••••••••" />
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4 form-check">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label"></label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fa-solid fa-right-to-bracket me-1"></i>
+                    Đăng nhập
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

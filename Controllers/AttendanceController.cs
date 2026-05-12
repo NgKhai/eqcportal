@@ -1,12 +1,15 @@
 using eqcportal.Data;
 using eqcportal.Models;
 using eqcportal.Models.ViewModels;
+using eqcportal.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace eqcportal.Controllers
 {
+    [Authorize(Roles = "Admin,HRManager")]
     public class AttendanceController : Controller
     {
         private const int DefaultPageSize = 10;
@@ -19,10 +22,12 @@ namespace eqcportal.Controllers
         ];
 
         private readonly ApplicationDbContext _context;
+        private readonly IAttendanceService _attendanceService;
 
-        public AttendanceController(ApplicationDbContext context)
+        public AttendanceController(ApplicationDbContext context, IAttendanceService attendanceService)
         {
             _context = context;
+            _attendanceService = attendanceService;
         }
 
         public async Task<IActionResult> Index(AttendanceFilterViewModel filter)
@@ -91,7 +96,7 @@ namespace eqcportal.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EmployeeId,Date,CheckIn,CheckOut,Status,Note")] Attendance attendance)
         {
-            await ValidateAttendanceAsync(attendance);
+            await _attendanceService.ValidateAttendanceAsync(attendance, ModelState);
 
             if (!ModelState.IsValid)
             {
@@ -100,11 +105,105 @@ namespace eqcportal.Controllers
                 return View(attendance);
             }
 
-            attendance.TotalHours = CalculateTotalHours(attendance.CheckIn, attendance.CheckOut);
+            attendance.TotalHours = _attendanceService.CalculateTotalHours(attendance.CheckIn, attendance.CheckOut);
             _context.Attendances.Add(attendance);
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Tạo chấm công thành công.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var attendance = await _context.Attendances
+                .Include(a => a.Employee)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (attendance == null)
+            {
+                return NotFound();
+            }
+
+            await LoadEmployeesAsync(attendance.EmployeeId);
+            ViewBag.AttendanceStatuses = new SelectList(AttendanceStatuses, attendance.Status);
+            return View(attendance);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,EmployeeId,Date,CheckIn,CheckOut,Status,Note")] Attendance attendance)
+        {
+            if (id != attendance.Id)
+            {
+                return NotFound();
+            }
+
+            var existing = await _context.Attendances.FindAsync(id);
+            if (existing == null)
+            {
+                return NotFound();
+            }
+
+            await _attendanceService.ValidateAttendanceAsync(attendance, ModelState, excludeId: id);
+
+            if (!ModelState.IsValid)
+            {
+                await LoadEmployeesAsync(attendance.EmployeeId);
+                ViewBag.AttendanceStatuses = new SelectList(AttendanceStatuses, attendance.Status);
+                return View(attendance);
+            }
+
+            existing.Date = attendance.Date.Date;
+            existing.CheckIn = attendance.CheckIn;
+            existing.CheckOut = attendance.CheckOut;
+            existing.Status = attendance.Status;
+            existing.Note = attendance.Note;
+            existing.TotalHours = _attendanceService.CalculateTotalHours(attendance.CheckIn, attendance.CheckOut);
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Cập nhật chấm công thành công.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var attendance = await _context.Attendances
+                .Include(a => a.Employee)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (attendance == null)
+            {
+                return NotFound();
+            }
+
+            return View(attendance);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var attendance = await _context.Attendances.FindAsync(id);
+            if (attendance == null)
+            {
+                return NotFound();
+            }
+
+            _context.Attendances.Remove(attendance);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Xóa chấm công thành công.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -113,37 +212,8 @@ namespace eqcportal.Controllers
             var selectedMonth = month ?? DateTime.Today.Month;
             var selectedYear = year ?? DateTime.Today.Year;
 
-            var rows = await _context.Employees
-                .Select(employee => new MonthlyAttendanceSummaryRowViewModel
-                {
-                    EmployeeId = employee.Id,
-                    EmployeeName = employee.FullName,
-                    PresentCount = employee.Attendances.Count(a => a.Date.Month == selectedMonth && a.Date.Year == selectedYear && a.Status == "Có mặt"),
-                    AbsentCount = employee.Attendances.Count(a => a.Date.Month == selectedMonth && a.Date.Year == selectedYear && a.Status == "Vắng mặt"),
-                    LateCount = employee.Attendances.Count(a => a.Date.Month == selectedMonth && a.Date.Year == selectedYear && a.Status == "Đi muộn"),
-                    HalfDayCount = employee.Attendances.Count(a => a.Date.Month == selectedMonth && a.Date.Year == selectedYear && a.Status == "Nửa ngày"),
-                    TotalHours = employee.Attendances
-                        .Where(a => a.Date.Month == selectedMonth && a.Date.Year == selectedYear)
-                        .Sum(a => a.TotalHours ?? 0),
-                    AverageHoursPerDay = 0
-                })
-                .OrderBy(row => row.EmployeeName)
-                .ToListAsync();
-
-            foreach (var row in rows)
-            {
-                var countedDays = row.PresentCount + row.LateCount + row.HalfDayCount;
-                row.AverageHoursPerDay = countedDays > 0
-                    ? Math.Round(row.TotalHours / countedDays, 2)
-                    : 0;
-            }
-
-            return View(new MonthlyAttendanceSummaryViewModel
-            {
-                Month = selectedMonth,
-                Year = selectedYear,
-                Rows = rows
-            });
+            var model = await _attendanceService.GetMonthlySummaryAsync(selectedMonth, selectedYear);
+            return View(model);
         }
 
         private async Task LoadEmployeesAsync(int? employeeId = null)
@@ -153,49 +223,6 @@ namespace eqcportal.Controllers
                 .ToListAsync();
 
             ViewBag.Employees = new SelectList(employees, "Id", "FullName", employeeId);
-        }
-
-        private async Task ValidateAttendanceAsync(Attendance attendance)
-        {
-            var attendanceDate = attendance.Date.Date;
-
-            var duplicateExists = await _context.Attendances.AnyAsync(a =>
-                a.EmployeeId == attendance.EmployeeId &&
-                a.Date == attendanceDate);
-
-            if (duplicateExists)
-            {
-                ModelState.AddModelError(string.Empty, "Nhân viên này đã có bản ghi chấm công trong ngày đã chọn.");
-            }
-
-            if (attendance.CheckIn.HasValue && attendance.CheckOut.HasValue && attendance.CheckOut <= attendance.CheckIn)
-            {
-                ModelState.AddModelError(nameof(Attendance.CheckOut), "Giờ ra phải lớn hơn giờ vào.");
-            }
-
-            if (!attendance.CheckIn.HasValue && attendance.CheckOut.HasValue)
-            {
-                ModelState.AddModelError(nameof(Attendance.CheckIn), "Vui lòng nhập giờ vào khi đã có giờ ra.");
-            }
-
-            if ((attendance.Status == "Có mặt" || attendance.Status == "Đi muộn" || attendance.Status == "Nửa ngày") &&
-                !attendance.CheckIn.HasValue)
-            {
-                ModelState.AddModelError(nameof(Attendance.CheckIn), "Vui lòng nhập giờ vào cho trạng thái này.");
-            }
-
-            attendance.Date = attendanceDate;
-        }
-
-        private static decimal? CalculateTotalHours(TimeSpan? checkIn, TimeSpan? checkOut)
-        {
-            if (!checkIn.HasValue || !checkOut.HasValue || checkOut <= checkIn)
-            {
-                return null;
-            }
-
-            var totalHours = (decimal)(checkOut.Value - checkIn.Value).TotalHours;
-            return Math.Round(totalHours, 2);
         }
     }
 }

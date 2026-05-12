@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using eqcportal.Models;
 
 namespace eqcportal.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -68,6 +70,13 @@ namespace eqcportal.Data
                 .HasForeignKey(r => r.EmployeeId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // ApplicationUser → Employee (optional link)
+            modelBuilder.Entity<ApplicationUser>()
+                .HasOne(u => u.Employee)
+                .WithMany()
+                .HasForeignKey(u => u.EmployeeId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // ── Unique constraint: one Attendance record per Employee per Date ─
             modelBuilder.Entity<Attendance>()
                 .HasIndex(a => new { a.EmployeeId, a.Date })
@@ -75,6 +84,17 @@ namespace eqcportal.Data
 
             // ── Seed Data ─────────────────────────────────────────────────────
             SeedData(modelBuilder);
+            SeedRoles(modelBuilder);
+        }
+
+        private static void SeedRoles(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<IdentityRole>().HasData(
+                new IdentityRole { Id = "role-admin",      Name = "Admin",      NormalizedName = "ADMIN" },
+                new IdentityRole { Id = "role-hrmanager",  Name = "HRManager",  NormalizedName = "HRMANAGER" },
+                new IdentityRole { Id = "role-supervisor", Name = "Supervisor", NormalizedName = "SUPERVISOR" },
+                new IdentityRole { Id = "role-employee",   Name = "Employee",   NormalizedName = "EMPLOYEE" }
+            );
         }
 
         private static void SeedData(ModelBuilder modelBuilder)

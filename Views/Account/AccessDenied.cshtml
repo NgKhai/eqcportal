@@ -1,0 +1,20 @@
+@{
+    ViewData["Title"] = "Truy cập bị từ chối";
+    ViewData["Breadcrumb"] = "Hệ thống / Truy cập bị từ chối";
+}
+
+<section class="page-heading">
+    <h1>Truy cập bị từ chối</h1>
+</section>
+
+<section class="eqc-card details-card">
+    <div class="empty-state py-5">
+        <i class="fa-solid fa-shield-halved fa-3x text-danger mb-3" aria-hidden="true"></i>
+        <h3>Bạn không có quyền truy cập trang này</h3>
+        <p class="text-secondary">Liên hệ quản trị viên nếu bạn cần được cấp quyền.</p>
+        <a class="btn btn-primary mt-3" asp-controller="Home" asp-action="Index">
+            <i class="fa-solid fa-arrow-left me-1" aria-hidden="true"></i>
+            Quay lại trang chủ
+        </a>
+    </div>
+</section>

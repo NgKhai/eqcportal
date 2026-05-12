@@ -1,0 +1,62 @@
+@model eqcportal.Models.LeaveRequest
+
+@{
+    ViewData["Title"] = "Sửa đơn nghỉ phép";
+    ViewData["Breadcrumb"] = "Vận hành HR / Đơn xin nghỉ phép / Sửa";
+}
+
+<section class="page-heading">
+    <h1>Sửa đơn nghỉ phép</h1>
+    <p>Cập nhật thông tin đơn nghỉ phép đang chờ duyệt.</p>
+</section>
+
+<section class="eqc-card form-card">
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-grid-2">
+            <div class="grid-full">
+                <label asp-for="EmployeeId" class="form-label"></label>
+                <select asp-for="EmployeeId" asp-items="ViewBag.Employees" class="form-select" disabled>
+                    <option value="">Chọn nhân viên</option>
+                </select>
+                <input type="hidden" asp-for="EmployeeId" />
+                <span asp-validation-for="EmployeeId" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="LeaveType" class="form-label"></label>
+                <select asp-for="LeaveType" asp-items="ViewBag.LeaveTypes" class="form-select"></select>
+                <span asp-validation-for="LeaveType" class="text-danger small"></span>
+            </div>
+            <div></div>
+            <div>
+                <label asp-for="StartDate" class="form-label"></label>
+                <input asp-for="StartDate" class="form-control" />
+                <span asp-validation-for="StartDate" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="EndDate" class="form-label"></label>
+                <input asp-for="EndDate" class="form-control" />
+                <span asp-validation-for="EndDate" class="text-danger small"></span>
+            </div>
+            <div class="grid-full">
+                <label asp-for="Reason" class="form-label"></label>
+                <textarea asp-for="Reason" class="form-control" rows="4" placeholder="Nhập lý do nghỉ phép"></textarea>
+                <span asp-validation-for="Reason" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-regular fa-floppy-disk me-1" aria-hidden="true"></i>
+                Cập nhật
+            </button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -74,6 +74,7 @@
                         <th>Tổng giờ</th>
                         <th>Trạng thái</th>
                         <th>Ghi chú</th>
+                        <th class="text-end">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -89,6 +90,16 @@
                                 <span class="eqc-badge @AttendanceBadgeClass(item.Status)">@item.Status</span>
                             </td>
                             <td class="text-secondary">@(string.IsNullOrWhiteSpace(item.Note) ? "-" : item.Note)</td>
+                            <td class="text-end">
+                                <div class="d-flex gap-1 justify-content-end">
+                                    <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.Id" title="Sửa">
+                                        <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id" title="Xóa">
+                                        <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                     }
                 </tbody>

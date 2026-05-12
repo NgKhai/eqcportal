@@ -2,12 +2,14 @@ using eqcportal.Data;
 using eqcportal.Models;
 using eqcportal.Models.ViewModels;
 using eqcportal.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace eqcportal.Controllers
 {
+    [Authorize(Roles = "Admin,HRManager")]
     public class EmployeeController : Controller
     {
         private const int DefaultPageSize = 10;

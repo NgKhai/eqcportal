@@ -1,12 +1,15 @@
 using eqcportal.Data;
 using eqcportal.Models;
 using eqcportal.Models.ViewModels;
+using eqcportal.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace eqcportal.Controllers
 {
+    [Authorize(Roles = "Admin,HRManager")]
     public class LeaveRequestController : Controller
     {
         private const int DefaultPageSize = 10;
@@ -20,10 +23,12 @@ namespace eqcportal.Controllers
         ];
 
         private readonly ApplicationDbContext _context;
+        private readonly ILeaveRequestService _leaveRequestService;
 
-        public LeaveRequestController(ApplicationDbContext context)
+        public LeaveRequestController(ApplicationDbContext context, ILeaveRequestService leaveRequestService)
         {
             _context = context;
+            _leaveRequestService = leaveRequestService;
         }
 
         public async Task<IActionResult> Index(LeaveRequestFilterViewModel filter)
@@ -119,10 +124,13 @@ namespace eqcportal.Controllers
             return View(leaveRequest);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Process(int id, string actionType, string? adminComment)
+        public async Task<IActionResult> Edit(int? id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
             var leaveRequest = await _context.LeaveRequests
                 .Include(l => l.Employee)
                 .FirstOrDefaultAsync(l => l.Id == id);
@@ -134,29 +142,97 @@ namespace eqcportal.Controllers
 
             if (leaveRequest.Status != "Chờ duyệt")
             {
-                TempData["Error"] = "Đơn nghỉ phép này đã được xử lý trước đó.";
+                TempData["Error"] = "Chỉ có thể sửa đơn nghỉ phép đang chờ duyệt.";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
-            if (actionType == "approve")
+            await LoadEmployeesAsync(leaveRequest.EmployeeId);
+            ViewBag.LeaveTypes = new SelectList(LeaveTypes, leaveRequest.LeaveType);
+            return View(leaveRequest);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,EmployeeId,StartDate,EndDate,LeaveType,Reason")] LeaveRequest leaveRequest)
+        {
+            if (id != leaveRequest.Id)
             {
-                leaveRequest.Status = "Đã duyệt";
-                leaveRequest.AdminComment = adminComment;
-                TempData["Success"] = "Đã duyệt đơn nghỉ phép.";
+                return NotFound();
             }
-            else if (actionType == "reject")
+
+            var existing = await _context.LeaveRequests.FindAsync(id);
+            if (existing == null)
             {
-                leaveRequest.Status = "Từ chối";
-                leaveRequest.AdminComment = adminComment;
-                TempData["Success"] = "Đã từ chối đơn nghỉ phép.";
+                return NotFound();
+            }
+
+            if (existing.Status != "Chờ duyệt")
+            {
+                TempData["Error"] = "Chỉ có thể sửa đơn nghỉ phép đang chờ duyệt.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            if (leaveRequest.EndDate < leaveRequest.StartDate)
+            {
+                ModelState.AddModelError(nameof(LeaveRequest.EndDate), "Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await LoadEmployeesAsync(leaveRequest.EmployeeId);
+                ViewBag.LeaveTypes = new SelectList(LeaveTypes, leaveRequest.LeaveType);
+                return View(leaveRequest);
+            }
+
+            existing.StartDate = leaveRequest.StartDate;
+            existing.EndDate = leaveRequest.EndDate;
+            existing.LeaveType = leaveRequest.LeaveType;
+            existing.Reason = leaveRequest.Reason;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Cập nhật đơn nghỉ phép thành công.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var leaveRequest = await _context.LeaveRequests.FindAsync(id);
+            if (leaveRequest == null)
+            {
+                return NotFound();
+            }
+
+            if (leaveRequest.Status != "Chờ duyệt")
+            {
+                TempData["Error"] = "Chỉ có thể hủy đơn nghỉ phép đang chờ duyệt.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            leaveRequest.Status = "Đã hủy";
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Đã hủy đơn nghỉ phép.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Process(int id, string actionType, string? adminComment)
+        {
+            var (success, message) = await _leaveRequestService.ProcessAsync(id, actionType, adminComment);
+
+            if (success)
+            {
+                TempData["Success"] = message;
             }
             else
             {
-                TempData["Error"] = "Thao tác không hợp lệ.";
-                return RedirectToAction(nameof(Details), new { id });
+                TempData["Error"] = message;
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Details), new { id });
         }
 

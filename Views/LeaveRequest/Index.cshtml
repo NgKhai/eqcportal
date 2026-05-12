@@ -72,9 +72,15 @@
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" aria-label="Chi tiết đơn nghỉ phép">
+                                    <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" aria-label="Chi tiết đơn nghỉ phép" title="Chi tiết">
                                         <i class="fa-regular fa-eye" aria-hidden="true"></i>
                                     </a>
+                                    @if (item.Status == "Chờ duyệt")
+                                    {
+                                        <a class="icon-btn" asp-action="Edit" asp-route-id="@item.Id" aria-label="Sửa đơn nghỉ phép" title="Sửa">
+                                            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                                        </a>
+                                    }
                                 </div>
                             </td>
                         </tr>

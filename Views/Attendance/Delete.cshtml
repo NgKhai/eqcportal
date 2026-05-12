@@ -1,0 +1,65 @@
+@model eqcportal.Models.Attendance
+
+@{
+    ViewData["Title"] = "Xóa chấm công";
+    ViewData["Breadcrumb"] = "Vận hành HR / Chấm công / Xóa";
+}
+
+<section class="page-heading">
+    <h1>Xóa chấm công</h1>
+    <p>Xác nhận xóa bản ghi chấm công này.</p>
+</section>
+
+<section class="eqc-card details-card">
+    <div class="info-grid">
+        <div>
+            <span>Nhân viên</span>
+            <strong>@Model.Employee?.FullName</strong>
+        </div>
+        <div>
+            <span>Ngày</span>
+            <strong>@Model.Date.ToString("dd/MM/yyyy")</strong>
+        </div>
+        <div>
+            <span>Giờ vào</span>
+            <strong>@(Model.CheckIn.HasValue ? Model.CheckIn.Value.ToString(@"hh\:mm") : "-")</strong>
+        </div>
+        <div>
+            <span>Giờ ra</span>
+            <strong>@(Model.CheckOut.HasValue ? Model.CheckOut.Value.ToString(@"hh\:mm") : "-")</strong>
+        </div>
+        <div>
+            <span>Tổng giờ</span>
+            <strong>@(Model.TotalHours.HasValue ? $"{Model.TotalHours.Value:N2} giờ" : "-")</strong>
+        </div>
+        <div>
+            <span>Trạng thái</span>
+            <strong>@Model.Status</strong>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Note))
+        {
+            <div class="grid-full">
+                <span>Ghi chú</span>
+                <strong>@Model.Note</strong>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="eqc-card form-card mt-3">
+    <div class="text-center py-3">
+        <i class="fa-solid fa-triangle-exclamation fa-2x text-danger mb-2" aria-hidden="true"></i>
+        <p class="mb-0"><strong>Bạn có chắc chắn muốn xóa bản ghi chấm công này?</strong></p>
+        <p class="text-secondary">Hành động này không thể hoàn tác.</p>
+    </div>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="form-actions justify-content-center">
+            <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash me-1" aria-hidden="true"></i>
+                Xóa chấm công
+            </button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+        </div>
+    </form>
+</section>

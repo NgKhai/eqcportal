@@ -1,0 +1,59 @@
+@model eqcportal.Models.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Tạo tài khoản";
+    ViewData["Breadcrumb"] = "Hệ thống / Tạo tài khoản";
+}
+
+<section class="page-heading">
+    <h1>Tạo tài khoản</h1>
+    <p>Thêm người dùng mới vào hệ thống và phân quyền truy cập.</p>
+</section>
+
+<section class="eqc-card form-card">
+    <form asp-action="Register" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="form-grid-2">
+            <div>
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" placeholder="Nhập họ và tên" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" placeholder="email@eqc.com" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" placeholder="Tối thiểu 6 ký tự" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+            </div>
+            <div class="grid-full">
+                <label asp-for="Role" class="form-label"></label>
+                <select asp-for="Role" asp-items="ViewBag.Roles" class="form-select">
+                    <option value="">Chọn vai trò</option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-user-plus me-1" aria-hidden="true"></i>
+                Tạo tài khoản
+            </button>
+            <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Hủy</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

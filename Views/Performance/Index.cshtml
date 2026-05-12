@@ -53,8 +53,14 @@
                             <td>@(string.IsNullOrWhiteSpace(item.ReviewerName) ? "-" : item.ReviewerName)</td>
                             <td>
                                 <div class="table-actions">
-                                    <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" aria-label="Chi tiết đánh giá">
+                                    <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" aria-label="Chi tiết đánh giá" title="Chi tiết">
                                         <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                                    </a>
+                                    <a class="icon-btn" asp-action="Edit" asp-route-id="@item.Id" aria-label="Sửa đánh giá" title="Sửa">
+                                        <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                                    </a>
+                                    <a class="icon-btn text-danger" asp-action="Delete" asp-route-id="@item.Id" aria-label="Xóa đánh giá" title="Xóa">
+                                        <i class="fa-solid fa-trash" aria-hidden="true"></i>
                                     </a>
                                 </div>
                             </td>

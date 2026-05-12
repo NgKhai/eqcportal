@@ -1,0 +1,76 @@
+@model eqcportal.Models.PerformanceReview
+
+@{
+    ViewData["Title"] = "Xóa đánh giá";
+    ViewData["Breadcrumb"] = "Vận hành HR / Đánh giá hiệu suất / Xóa";
+}
+
+<section class="page-heading">
+    <h1>Xóa đánh giá</h1>
+    <p>Xác nhận xóa bản đánh giá hiệu suất này.</p>
+</section>
+
+<section class="eqc-card details-card">
+    <div class="info-grid">
+        <div>
+            <span>Nhân viên</span>
+            <strong>@Model.Employee?.FullName</strong>
+        </div>
+        <div>
+            <span>Kỳ đánh giá</span>
+            <strong>@Model.ReviewPeriod</strong>
+        </div>
+        <div>
+            <span>Người đánh giá</span>
+            <strong>@(string.IsNullOrWhiteSpace(Model.ReviewerName) ? "-" : Model.ReviewerName)</strong>
+        </div>
+        <div>
+            <span>Tổng điểm</span>
+            <strong>
+                <i class="fa-solid fa-star text-warning" aria-hidden="true"></i>
+                @Model.OverallRating.ToString("N2")
+            </strong>
+        </div>
+        <div>
+            <span>Làm việc nhóm</span>
+            <strong>@Model.TeamworkScore / 5</strong>
+        </div>
+        <div>
+            <span>Kỹ năng</span>
+            <strong>@Model.SkillScore / 5</strong>
+        </div>
+        <div>
+            <span>Đúng giờ</span>
+            <strong>@Model.PunctualityScore / 5</strong>
+        </div>
+        <div>
+            <span>Thái độ</span>
+            <strong>@Model.AttitudeScore / 5</strong>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Comment))
+        {
+            <div class="grid-full">
+                <span>Nhận xét</span>
+                <strong>@Model.Comment</strong>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="eqc-card form-card mt-3">
+    <div class="text-center py-3">
+        <i class="fa-solid fa-triangle-exclamation fa-2x text-danger mb-2" aria-hidden="true"></i>
+        <p class="mb-0"><strong>Bạn có chắc chắn muốn xóa bản đánh giá này?</strong></p>
+        <p class="text-secondary">Hành động này không thể hoàn tác.</p>
+    </div>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="form-actions justify-content-center">
+            <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash me-1" aria-hidden="true"></i>
+                Xóa đánh giá
+            </button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+        </div>
+    </form>
+</section>

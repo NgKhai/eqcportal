@@ -122,9 +122,25 @@
             <i class="fa-regular fa-moon" data-theme-icon aria-hidden="true"></i>
         </button>
 
-        <div class="user-pill">
-            <span class="avatar" aria-hidden="true">A</span>
-            <span>Admin</span>
+        <div class="dropdown">
+            <button class="user-pill" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="avatar" aria-hidden="true">@(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "U")</span>
+                <span>@(User.Identity?.Name ?? "Người dùng")</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+                @if (User.IsInRole("Admin"))
+                {
+                    <a class="dropdown-item" asp-controller="Account" asp-action="Register">
+                        <i class="fa-solid fa-user-plus me-2" aria-hidden="true"></i>Tạo tài khoản
+                    </a>
+                    <hr class="dropdown-divider" />
+                }
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="fa-solid fa-right-from-bracket me-2" aria-hidden="true"></i>Đăng xuất
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </header>

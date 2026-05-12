@@ -1,10 +1,12 @@
 using eqcportal.Data;
 using eqcportal.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace eqcportal.Controllers
 {
+    [Authorize(Roles = "Admin,HRManager")]
     public class PositionController : Controller
     {
         private readonly ApplicationDbContext _context;
