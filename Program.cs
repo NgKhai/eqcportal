@@ -105,9 +105,10 @@ static async Task SeedAdminUserAsync(IServiceProvider services)
         }
     }
 
-    // Create default admin if not exists
-    const string adminEmail = "admin@eqc.com";
-    const string adminPassword = "Admin@123";
+    // Create default admin if not exists using configuration
+    var config = services.GetRequiredService<IConfiguration>();
+    string adminEmail = config["AdminAccount:Email"] ?? "admin@eqc.com";
+    string adminPassword = config["AdminAccount:Password"] ?? "ChangeMe123!";
 
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
